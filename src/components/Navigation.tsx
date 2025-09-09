@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Calendar, Users, PlusCircle, BarChart3 } from "lucide-react";
+import { Calendar, Users, PlusCircle, BarChart3, Info } from "lucide-react";
 import { useState } from "react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface NavigationProps {
   currentView: "landing" | "organizer" | "participant" | "events";
@@ -36,6 +37,15 @@ export const Navigation = ({ currentView, onViewChange }: NavigationProps) => {
               <span>Discover Events</span>
             </Button>
 
+            <Button
+              variant={currentView === "landing" ? "default" : "ghost"}
+              onClick={() => onViewChange("landing")}
+              className="flex items-center space-x-2"
+            >
+              <Info className="h-4 w-4" />
+              <span>About</span>
+            </Button>
+
             {userRole === "organizer" && (
               <Button
                 variant={currentView === "organizer" ? "default" : "ghost"}
@@ -49,7 +59,7 @@ export const Navigation = ({ currentView, onViewChange }: NavigationProps) => {
 
             <div className="flex items-center space-x-2">
               <Button
-                variant={userRole === "organizer" ? "default" : "outline"}
+                variant="default"
                 onClick={() => {
                   setUserRole("organizer");
                   onViewChange("organizer");
@@ -69,8 +79,10 @@ export const Navigation = ({ currentView, onViewChange }: NavigationProps) => {
                 size="sm"
               >
                 <Users className="h-4 w-4 mr-1" />
-                Join Events
+                My Events
               </Button>
+
+              <ThemeToggle />
             </div>
           </div>
         </div>

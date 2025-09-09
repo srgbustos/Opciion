@@ -6,7 +6,7 @@ import { EventListing } from "@/components/EventListing";
 import { ParticipantDashboard } from "@/components/ParticipantDashboard";
 
 const Index = () => {
-  const [currentView, setCurrentView] = useState<"landing" | "organizer" | "participant" | "events">("landing");
+  const [currentView, setCurrentView] = useState<"landing" | "organizer" | "participant" | "events">("events");
 
   const handleGetStarted = () => {
     setCurrentView("events");
@@ -27,9 +27,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {currentView !== "landing" && (
-        <Navigation currentView={currentView} onViewChange={setCurrentView} />
-      )}
+      <Navigation currentView={currentView} onViewChange={setCurrentView} />
       {renderCurrentView()}
     </div>
   );
