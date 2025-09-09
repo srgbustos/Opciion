@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Calendar, Plus, Info, User, LogOut } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ThemeToggle } from "./ThemeToggle";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -12,6 +12,7 @@ import {
 
 export const Navigation = () => {
   const { user, signOut } = useAuth();
+  const location = useLocation();
 
   return (
     <nav className="bg-card border-b border-border shadow-soft">
@@ -27,14 +28,20 @@ export const Navigation = () => {
           </div>
 
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" asChild>
+            <Button 
+              variant={location.pathname === "/events" ? "secondary" : "ghost"} 
+              asChild
+            >
               <Link to="/events" className="flex items-center space-x-2">
                 <Calendar className="h-4 w-4" />
                 <span>Browse Events</span>
               </Link>
             </Button>
             
-            <Button variant="ghost" asChild>
+            <Button 
+              variant={location.pathname === "/create-event" ? "secondary" : "ghost"} 
+              asChild
+            >
               <Link to="/create-event" className="flex items-center space-x-2">
                 <Plus className="h-4 w-4" />
                 <span>Create Event</span>
@@ -42,30 +49,22 @@ export const Navigation = () => {
             </Button>
 
             {user ? (
-              <>
-                <Button variant="hero" size="lg" asChild>
-                  <Link to="/create-event">
-                    <Plus className="h-5 w-5 mr-2" />
-                    Create Event
-                  </Link>
-                </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm">
-                      <User className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem asChild>
-                      <Link to="/dashboard">Dashboard</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={signOut}>
-                      <LogOut className="h-4 w-4 mr-2" />
-                      Sign Out
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm">
+                    <User className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard">Dashboard</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={signOut}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <Button variant="hero" size="lg" asChild>
                 <Link to="/auth">
