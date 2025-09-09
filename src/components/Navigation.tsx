@@ -22,7 +22,7 @@ export const Navigation = ({ currentView, onViewChange }: NavigationProps) => {
             >
               <Calendar className="h-8 w-8 text-primary" />
               <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                EventFlow
+                Opciion
               </span>
             </div>
           </div>

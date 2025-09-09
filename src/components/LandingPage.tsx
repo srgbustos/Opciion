@@ -140,7 +140,7 @@ export const LandingPage = ({ onGetStarted }: LandingPageProps) => {
             Ready to Transform Your Events?
           </h2>
           <p className="text-xl text-primary-foreground/90 max-w-2xl mx-auto">
-            Join thousands of organizers who trust EventFlow to create exceptional experiences.
+            Join thousands of organizers who trust Opciion to create exceptional experiences.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="secondary" size="xl" onClick={onGetStarted}>
