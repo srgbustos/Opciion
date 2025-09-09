@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { 
   Calendar, 
   MapPin, 
@@ -20,6 +21,7 @@ import { useState } from "react";
 export const EventListing = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   // Fetch events from database
   const { data: events = [], isLoading } = useQuery({
@@ -118,7 +120,11 @@ export const EventListing = () => {
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filteredEvents.map((event) => (
-              <Card key={event.id} className="group overflow-hidden bg-gradient-card border-0 shadow-soft hover:shadow-medium transition-smooth">
+              <Card 
+                key={event.id} 
+                className="group overflow-hidden bg-gradient-card border-0 shadow-soft hover:shadow-medium transition-smooth cursor-pointer"
+                onClick={() => navigate(`/events/${event.id}`)}
+              >
                 {event.featured && (
                   <div className="absolute top-4 left-4 z-10">
                     <Badge className="bg-gradient-primary text-primary-foreground">
@@ -183,8 +189,15 @@ export const EventListing = () => {
                         </>
                       )}
                     </div>
-                    <Button variant="default" size="sm">
-                      Register Now
+                    <Button 
+                      variant="default" 
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/events/${event.id}`);
+                      }}
+                    >
+                      View Details
                     </Button>
                   </div>
                 </CardContent>
