@@ -66,6 +66,10 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        chart: {
+          "3": "hsl(var(--chart-3))",
+          "4": "hsl(var(--chart-4))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

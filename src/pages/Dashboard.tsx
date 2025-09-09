@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { 
   Calendar, 
   MapPin, 
@@ -218,21 +217,44 @@ const Dashboard = () => {
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <ToggleGroup 
-                type="single" 
-                value={viewMode} 
-                onValueChange={(value) => value && setViewMode(value as "participant" | "creator")}
-                className="bg-muted p-1 rounded-lg"
-              >
-                <ToggleGroupItem value="participant" className="data-[state=on]:bg-background">
-                  <Users className="h-4 w-4 mr-2" />
-                  Participant
-                </ToggleGroupItem>
-                <ToggleGroupItem value="creator" className="data-[state=on]:bg-background">
-                  <BarChart3 className="h-4 w-4 mr-2" />
-                  Event Creator
-                </ToggleGroupItem>
-              </ToggleGroup>
+              {/* Custom Animated Toggle */}
+              <div className="relative bg-muted p-1 rounded-xl shadow-inner">
+                <div 
+                  className={`absolute top-1 bottom-1 bg-gradient-to-r transition-all duration-300 ease-out rounded-lg shadow-md ${
+                    viewMode === "participant" 
+                      ? "left-1 right-1/2 from-primary to-primary-glow" 
+                      : "left-1/2 right-1 from-chart-3 to-chart-4"
+                  }`}
+                />
+                <div className="relative flex">
+                  <button
+                    onClick={() => setViewMode("participant")}
+                    className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 ease-out flex items-center gap-2 ${
+                      viewMode === "participant"
+                        ? "text-primary-foreground shadow-lg scale-105"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <Users className={`h-4 w-4 transition-all duration-300 ${
+                      viewMode === "participant" ? "scale-110" : ""
+                    }`} />
+                    <span className="font-semibold">Participant</span>
+                  </button>
+                  <button
+                    onClick={() => setViewMode("creator")}
+                    className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 ease-out flex items-center gap-2 ${
+                      viewMode === "creator"
+                        ? "text-primary-foreground shadow-lg scale-105"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <BarChart3 className={`h-4 w-4 transition-all duration-300 ${
+                      viewMode === "creator" ? "scale-110" : ""
+                    }`} />
+                    <span className="font-semibold">Event Creator</span>
+                  </button>
+                </div>
+              </div>
               {viewMode === "participant" ? (
                 <Button variant="default" asChild>
                   <Link to="/events">
