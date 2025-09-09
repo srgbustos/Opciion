@@ -223,7 +223,7 @@ const Dashboard = () => {
                   className={`absolute top-1 bottom-1 bg-gradient-to-r transition-all duration-300 ease-out rounded-lg shadow-md ${
                     viewMode === "participant" 
                       ? "left-1 right-1/2 from-primary to-primary-glow" 
-                      : "left-1/2 right-1 from-chart-3 to-chart-4"
+                      : "left-1/2 right-1 from-primary to-primary-glow"
                   }`}
                 />
                 <div className="relative flex">
@@ -255,14 +255,7 @@ const Dashboard = () => {
                   </button>
                 </div>
               </div>
-              {viewMode === "participant" ? (
-                <Button variant="default" asChild>
-                  <Link to="/events">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    Discover Events
-                  </Link>
-                </Button>
-              ) : (
+              {viewMode === "creator" && (
                 <Button variant="default" asChild>
                   <Link to="/create-event">
                     <Plus className="h-4 w-4 mr-2" />
