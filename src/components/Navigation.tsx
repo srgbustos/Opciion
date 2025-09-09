@@ -28,16 +28,9 @@ export const Navigation = () => {
 
           <div className="flex items-center space-x-4">
             <Button variant="ghost" asChild>
-              <Link to="/" className="flex items-center space-x-2">
+              <Link to="/events" className="flex items-center space-x-2">
                 <Calendar className="h-4 w-4" />
-                <span>Discover Events</span>
-              </Link>
-            </Button>
-
-            <Button variant="ghost" asChild>
-              <Link to="/about" className="flex items-center space-x-2">
-                <Info className="h-4 w-4" />
-                <span>About</span>
+                <span>Browse Events</span>
               </Link>
             </Button>
 

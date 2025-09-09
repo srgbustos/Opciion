@@ -1,10 +1,11 @@
 import { LandingPage } from "@/components/LandingPage";
 import { Navigation } from "@/components/Navigation";
 
-const About = () => {
+const CreateEvent = () => {
   const handleGetStarted = () => {
-    // Navigate to home page with events
-    window.location.href = "/";
+    // Could navigate to an event creation form or scroll to form section
+    // For now, we'll keep the existing behavior
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -15,4 +16,4 @@ const About = () => {
   );
 };
 
-export default About;
+export default CreateEvent;

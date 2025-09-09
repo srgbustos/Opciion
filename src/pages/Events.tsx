@@ -1,13 +1,13 @@
-import { DiscoverLanding } from "@/components/DiscoverLanding";
+import { EventListing } from "@/components/EventListing";
 import { Navigation } from "@/components/Navigation";
 
-const Index = () => {
+const Events = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <DiscoverLanding />
+      <EventListing />
     </div>
   );
 };
 
-export default Index;
+export default Events;
