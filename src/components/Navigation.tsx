@@ -33,6 +33,13 @@ export const Navigation = () => {
                 <span>Browse Events</span>
               </Link>
             </Button>
+            
+            <Button variant="ghost" asChild>
+              <Link to="/create-event" className="flex items-center space-x-2">
+                <Plus className="h-4 w-4" />
+                <span>Create Event</span>
+              </Link>
+            </Button>
 
             {user ? (
               <>
