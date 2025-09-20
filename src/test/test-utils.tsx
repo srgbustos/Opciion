@@ -51,8 +51,40 @@ vi.mock('react-router-dom', async () => {
   }
 })
 
+// Mock @tanstack/react-query
+vi.mock('@tanstack/react-query', async () => {
+  const actual = await vi.importActual('@tanstack/react-query')
+  return {
+    ...actual,
+    QueryClient: vi.fn().mockImplementation((options) => ({
+      defaultOptions: options?.defaultOptions || {},
+      getQueryData: vi.fn(),
+      setQueryData: vi.fn(),
+      invalidateQueries: vi.fn(),
+      refetchQueries: vi.fn(),
+      cancelQueries: vi.fn(),
+      removeQueries: vi.fn(),
+      clear: vi.fn(),
+      mount: vi.fn(),
+      unmount: vi.fn(),
+      getQueryCache: vi.fn(),
+      getMutationCache: vi.fn(),
+      isFetching: vi.fn(),
+      isMutating: vi.fn(),
+      getDefaultOptions: vi.fn(),
+      setDefaultOptions: vi.fn(),
+      setQueryDefaults: vi.fn(),
+      setMutationDefaults: vi.fn(),
+      getQueryDefaults: vi.fn(),
+      getMutationDefaults: vi.fn(),
+      getLogger: vi.fn(),
+      setLogger: vi.fn(),
+    }))
+  }
+})
+
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
-  const queryClient = new (QueryClient as any)({
+  const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
         retry: false,
