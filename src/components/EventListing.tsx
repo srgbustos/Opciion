@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { filterExpiredEvents } from "@/lib/eventUtils";
 import { 
   Calendar, 
   MapPin, 
@@ -40,7 +41,10 @@ export const EventListing = () => {
 
   const categories = ["All", "Technology", "Business", "Design", "Outdoor", "Education"];
 
-  const filteredEvents = events.filter(event =>
+  // Filter out expired events first, then apply search filter
+  const nonExpiredEvents = filterExpiredEvents(events);
+  
+  const filteredEvents = nonExpiredEvents.filter(event =>
     event.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     event.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     event.location?.toLowerCase().includes(searchQuery.toLowerCase())

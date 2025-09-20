@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Navigation } from "@/components/Navigation";
+import { isEventExpired } from "@/lib/eventUtils";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -167,7 +168,7 @@ const EventDetails = () => {
 
   const isRegistered = !!registration;
   const eventDate = new Date(event.date);
-  const isEventPassed = eventDate < new Date();
+  const isEventPassed = event ? isEventExpired(event.date, event.time) : false;
 
   return (
     <div className="min-h-screen bg-background">
