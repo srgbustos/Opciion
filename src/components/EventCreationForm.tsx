@@ -16,30 +16,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { 
-  Calendar,
-  Clock,
-  MapPin,
-  Users,
-  DollarSign,
-  Image as ImageIcon,
-  Star,
-  Sparkles,
-  ArrowRight,
-  Plus,
-  Trash2,
-  Upload,
-  AlertCircle,
-  CheckCircle,
-  X,
-  HelpCircle,
-  Ticket,
-  FormInput,
-  Mail,
-  FileText,
-  Eye,
-  EyeOff
-} from "lucide-react";
+import { Calendar, Clock, MapPin, Users, DollarSign, Image as ImageIcon, Star, Sparkles, ArrowRight, Plus, Trash2, Upload, CircleAlert as AlertCircle, CircleCheck as CheckCircle, X, CircleHelp as HelpCircle, Ticket, FolderInput as FormInput, Mail, FileText, Eye, EyeOff, Package } from "lucide-react";
 import { eventCreationSchema, EventCreationFormData } from "@/lib/eventValidation";
 import { 
   DEFAULT_FAQ_ITEMS, 
@@ -56,10 +33,13 @@ import {
 } from "@/types/eventCreation";
 import { uploadImageToStorage, validateImageFile, formatFileSize } from "@/lib/imageUpload";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { ModuleBuilder } from "@/components/ModuleBuilder";
+import { EventModule } from "@/types/customModules";
 
 export const EventCreationForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadingImages, setUploadingImages] = useState<string[]>([]);
+  const [customModules, setCustomModules] = useState<EventModule[]>([]);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -147,10 +127,106 @@ export const EventCreationForm = () => {
     setIsSubmitting(true);
 
     try {
-      // Here you would typically send the data to your API endpoint
-      // For now, we'll just show a success message
-      console.log("Event data:", data);
-      
+      const { data: eventData, error: eventError } = await supabase
+        .from('events')
+        .insert({
+          organizer_id: user.id,
+          title: data.title,
+          short_description: data.shortDescription,
+          overview: data.overview,
+          location: data.location,
+          start_date: data.startDate,
+          end_date: data.endDate,
+          primary_event_date: data.primaryEventDate,
+          main_image_url: data.images.main?.url,
+          gallery_images: data.images.gallery,
+          confirmation_message: data.confirmationPageMessage,
+          confirmation_email: data.confirmationEmail,
+          hashtags: data.hashtags,
+          status: 'draft'
+        })
+        .select()
+        .single();
+
+      if (eventError) throw eventError;
+
+      const eventId = eventData.id;
+
+      if (data.faq.length > 0) {
+        const { error: faqError } = await supabase
+          .from('faq_items')
+          .insert(
+            data.faq.map((item, index) => ({
+              event_id: eventId,
+              question: item.question,
+              answer: item.answer,
+              sort_order: index
+            }))
+          );
+
+        if (faqError) throw faqError;
+      }
+
+      if (data.tickets.length > 0) {
+        const { error: ticketsError } = await supabase
+          .from('ticket_types')
+          .insert(
+            data.tickets.map((ticket, index) => ({
+              event_id: eventId,
+              name: ticket.name,
+              description: ticket.description,
+              price: ticket.price,
+              fee: ticket.fee,
+              quantity_per_order: ticket.quantityPerOrder,
+              is_active: ticket.active,
+              sort_order: index
+            }))
+          );
+
+        if (ticketsError) throw ticketsError;
+      }
+
+      if (customModules.length > 0) {
+        for (const module of customModules) {
+          const { data: moduleData, error: moduleError } = await supabase
+            .from('event_modules')
+            .insert({
+              event_id: eventId,
+              module_type: module.module_type,
+              module_name: module.module_name,
+              module_icon: module.module_icon,
+              module_image_url: module.module_image_url,
+              module_description: module.module_description,
+              sort_order: module.sort_order,
+              is_active: module.is_active
+            })
+            .select()
+            .single();
+
+          if (moduleError) throw moduleError;
+
+          if (module.fields.length > 0) {
+            const { error: fieldsError } = await supabase
+              .from('module_fields')
+              .insert(
+                module.fields.map((field, index) => ({
+                  module_id: moduleData.id,
+                  field_key: field.field_key,
+                  field_type: field.field_type,
+                  field_label: field.field_label,
+                  field_placeholder: field.field_placeholder,
+                  field_options: field.field_options,
+                  is_required: field.is_required,
+                  sort_order: index,
+                  validation_rules: field.validation_rules
+                }))
+              );
+
+            if (fieldsError) throw fieldsError;
+          }
+        }
+      }
+
       toast.success("Event created successfully!");
       navigate("/events");
     } catch (error: any) {
@@ -199,11 +275,12 @@ export const EventCreationForm = () => {
           <CardContent className="p-0">
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <Tabs defaultValue="basics" className="w-full">
-                <TabsList className="grid w-full grid-cols-7">
+                <TabsList className="grid w-full grid-cols-8">
                   <TabsTrigger value="basics">Event Basics</TabsTrigger>
                   <TabsTrigger value="media">Media</TabsTrigger>
                   <TabsTrigger value="faq">FAQ</TabsTrigger>
                   <TabsTrigger value="tickets">Tickets</TabsTrigger>
+                  <TabsTrigger value="modules">Custom Modules</TabsTrigger>
                   <TabsTrigger value="orderform">Order Form</TabsTrigger>
                   <TabsTrigger value="confirmation">Confirmation</TabsTrigger>
                   <TabsTrigger value="email">Email</TabsTrigger>
@@ -633,6 +710,26 @@ export const EventCreationForm = () => {
                         </Card>
                       ))}
                     </div>
+                  </div>
+                </TabsContent>
+
+                {/* Custom Modules Tab */}
+                <TabsContent value="modules" className="p-6 space-y-6">
+                  <div className="space-y-4">
+                    <h3 className="text-xl font-semibold flex items-center gap-2">
+                      <Package className="h-5 w-5 text-primary" />
+                      Custom Modules
+                    </h3>
+
+                    <p className="text-muted-foreground">
+                      Add predefined modules like Tickets, Transportation, and Hospitality, or create custom modules
+                      with your own fields. Each module can include images and custom field types.
+                    </p>
+
+                    <ModuleBuilder
+                      modules={customModules}
+                      onChange={setCustomModules}
+                    />
                   </div>
                 </TabsContent>
 
