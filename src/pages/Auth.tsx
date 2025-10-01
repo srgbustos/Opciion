@@ -17,6 +17,7 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [resendEmail, setResendEmail] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,7 +46,7 @@ export default function Auth() {
 
     const redirectUrl = `${window.location.origin}/`;
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -59,7 +60,37 @@ export default function Auth() {
     if (error) {
       setError(error.message);
     } else {
-      setMessage("Check your email for the confirmation link!");
+      if (data?.user?.identities && data.user.identities.length === 0) {
+        setError("This email is already registered. Please sign in instead.");
+      } else if (data?.user && !data.user.confirmed_at) {
+        setMessage("Please check your email to confirm your account before signing in.");
+        setResendEmail(email);
+      } else {
+        setMessage("Account created successfully! You can now sign in.");
+      }
+    }
+    setLoading(false);
+  };
+
+  const handleResendConfirmation = async () => {
+    if (!resendEmail) return;
+
+    setLoading(true);
+    setError("");
+    setMessage("");
+
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: resendEmail,
+      options: {
+        emailRedirectTo: `${window.location.origin}/`
+      }
+    });
+
+    if (error) {
+      setError(error.message);
+    } else {
+      setMessage("Confirmation email has been resent! Please check your inbox.");
     }
     setLoading(false);
   };
@@ -68,14 +99,24 @@ export default function Auth() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setMessage("");
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
-      setError(error.message);
+      if (error.message.includes("Email not confirmed")) {
+        setError("Please confirm your email address before signing in. Check your inbox for the confirmation link.");
+        setResendEmail(email);
+      } else {
+        setError(error.message);
+      }
+    } else if (data?.user && !data.user.email_confirmed_at) {
+      setError("Your email address has not been confirmed. Please check your inbox for the confirmation link.");
+      setResendEmail(email);
+      await supabase.auth.signOut();
     }
     setLoading(false);
   };
@@ -143,7 +184,19 @@ export default function Auth() {
                   </div>
                   {error && (
                     <Alert className="border-destructive/50 text-destructive">
-                      <AlertDescription>{error}</AlertDescription>
+                      <AlertDescription>
+                        {error}
+                        {resendEmail && error.includes("confirm") && (
+                          <Button
+                            variant="link"
+                            className="ml-2 p-0 h-auto underline"
+                            onClick={handleResendConfirmation}
+                            disabled={loading}
+                          >
+                            Resend confirmation email
+                          </Button>
+                        )}
+                      </AlertDescription>
                     </Alert>
                   )}
                   <Button type="submit" className="w-full" disabled={loading}>
@@ -216,7 +269,19 @@ export default function Auth() {
                   )}
                   {message && (
                     <Alert className="border-success/50 text-success">
-                      <AlertDescription>{message}</AlertDescription>
+                      <AlertDescription>
+                        {message}
+                        {resendEmail && (
+                          <Button
+                            variant="link"
+                            className="ml-2 p-0 h-auto"
+                            onClick={handleResendConfirmation}
+                            disabled={loading}
+                          >
+                            Resend email
+                          </Button>
+                        )}
+                      </AlertDescription>
                     </Alert>
                   )}
                   <Button type="submit" className="w-full" disabled={loading}>
